@@ -1,0 +1,8 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.4.1",
+    "libraryName": "spfx-aad-external-api-consumer",
+    "libraryId": "b7d49cbb-34d6-4456-b8e9-f2f39e241188",
+    "environment": "spo"
+  }
+}
