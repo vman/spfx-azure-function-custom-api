@@ -36,22 +36,41 @@ export default class ExternalApiConsumerWebPart extends BaseClientSideWebPart<IE
 
     /*Create a new instance of AadHttpClient by passing in the current ServiceScope 
     and the ClientId (Application ID) of the Azure AD app registration*/
-    const customApiClient: AadHttpClient = new AadHttpClient(this.context.serviceScope, '2d172907-ddaa-4046-a3f8-dcf3483a196d');
-    customApiClient
-      .get('https://userdetails.azurewebsites.net/api/CurrentUser', //Your Azure Function endpoint
-        AadHttpClient.configurations.v1)
-      .then((response: HttpClientResponse): Promise<JSON> => {
-        return response.json();
-      })
-      .then((responseJSON: JSON): void => {
+    // const customApiClient: AadHttpClient = new AadHttpClient(this.context.serviceScope, '2d172907-ddaa-4046-a3f8-dcf3483a196d');
+    // customApiClient
+    //   .get('https://userdetails.azurewebsites.net/api/CurrentUser', //Your Azure Function endpoint
+    //     AadHttpClient.configurations.v1)
+    //   .then((response: HttpClientResponse): Promise<JSON> => {
+    //     return response.json();
+    //   })
+    //   .then((responseJSON: JSON): void => {
 
-        //Display the JSON in a table
-        var claimsTable = this.domElement.getElementsByClassName("azFuncClaimsTable")[0];
-        for (var key in responseJSON) {
-          var trElement = document.createElement("tr");
-          trElement.innerHTML = `<td class="${styles.azFuncCell}">${key}</td><td class="${styles.azFuncCell}">${responseJSON[key]}</td>`;
-          claimsTable.appendChild(trElement);
-        }
+    //     //Display the JSON in a table
+    //     var claimsTable = this.domElement.getElementsByClassName("azFuncClaimsTable")[0];
+    //     for (var key in responseJSON) {
+    //       var trElement = document.createElement("tr");
+    //       trElement.innerHTML = `<td class="${styles.azFuncCell}">${key}</td><td class="${styles.azFuncCell}">${responseJSON[key]}</td>`;
+    //       claimsTable.appendChild(trElement);
+    //     }
+    //   });
+
+    this.context.aadHttpClientFactory
+      .getClient('https://vrdmn.onmicrosoft.com/6b347c27-f360-47ac-b4d4-af78d0da4223')
+      .then((client: AadHttpClient): void => {
+        client
+          .get('https://userdetails.azurewebsites.net/api/CurrentUser', AadHttpClient.configurations.v1)
+          .then((response: HttpClientResponse): Promise<JSON> => {
+            return response.json();
+          })
+          .then((responseJSON: JSON): void => {
+            //Display the JSON in a table
+            var claimsTable = this.domElement.getElementsByClassName("azFuncClaimsTable")[0];
+            for (var key in responseJSON) {
+              var trElement = document.createElement("tr");
+              trElement.innerHTML = `<td class="${styles.azFuncCell}">${key}</td><td class="${styles.azFuncCell}">${responseJSON[key]}</td>`;
+              claimsTable.appendChild(trElement);
+            }
+          });
       });
   }
 
