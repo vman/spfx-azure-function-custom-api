@@ -1,27 +1,27 @@
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Host;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.SharePoint.Client;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace UserDetails
 {
-    public static class CallSharePoint
+    public static class CurrentInfoFromSharePoint
     {
-        [FunctionName("CurrentUserFromSharePoint")]
+        [FunctionName("CurrentInfoFromSharePoint")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
             string ClientId = "<client-id-of-custom-aad-app>";
             string ClientSecret = "<client-secret-of-custom-aad-app>";
 
-            string spRootResourceUrl = "https://tenant.sharepoint.com";
-            string spSiteUrl = $"{spRootResourceUrl}/sites/comms";
+            string spRootResourceUrl = "https://<your-tenant>.sharepoint.com";
+            string spSiteUrl = $"{spRootResourceUrl}/sites/Comms";
 
             //Get the tenant id from the current claims
             string tenantId = ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/tenantid")?.Value;
@@ -38,9 +38,8 @@ namespace UserDetails
             AuthenticationResult authResult = await authContext.AcquireTokenAsync(spRootResourceUrl, clientCred, userAssertion);
             var spAccessToken = authResult.AccessToken;
 
-            //Get CSOM ClientContext using the SharePoint Access Token. OfficeDevPnP nuget package is needed for using the extention methods.
-            var authManager = new OfficeDevPnP.Core.AuthenticationManager();
-            var clientContext = authManager.GetAzureADAccessTokenAuthenticatedContext(spSiteUrl, spAccessToken);
+            //Get CSOM ClientContext using the SharePoint Access Token
+            var clientContext = GetAzureADAccessTokenAuthenticatedContext(spSiteUrl, spAccessToken);
 
             //The usual CSOM stuff.
             var web = clientContext.Web;
@@ -54,6 +53,18 @@ namespace UserDetails
             result.Add("Current User in SharePoint", currentUser.Title);
             return req.CreateResponse(HttpStatusCode.OK, result, JsonMediaTypeFormatter.DefaultMediaType);
 
+        }
+
+        public static ClientContext GetAzureADAccessTokenAuthenticatedContext(string siteUrl, string accessToken)
+        {
+            var clientContext = new ClientContext(siteUrl);
+
+            clientContext.ExecutingWebRequest += (sender, args) =>
+            {
+                args.WebRequestExecutor.RequestHeaders["Authorization"] = "Bearer " + accessToken;
+            };
+
+            return clientContext;
         }
     }
 }

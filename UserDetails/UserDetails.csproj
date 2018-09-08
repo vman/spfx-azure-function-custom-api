@@ -5,7 +5,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="3.19.8" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.6" />
-    <PackageReference Include="SharePointPnPCoreOnline" Version="2.24.1803" />
+    <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.8029.1200" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
