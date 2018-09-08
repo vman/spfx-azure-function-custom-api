@@ -3,3 +3,5 @@ UserDetails/Properties/PublishProfiles/userdetails - Web Deploy.pubxml
 .vs/UserDetails/v15/Server/sqlite3/db.lock
 .vs/UserDetails/v15/Server/sqlite3/storage.ide-shm
 .vs/UserDetails/v15/Server/sqlite3/storage.ide-wal
+.vs/UserDetails/v15/.suo
+.vs/UserDetails/v15/Server/sqlite3/storage.ide
